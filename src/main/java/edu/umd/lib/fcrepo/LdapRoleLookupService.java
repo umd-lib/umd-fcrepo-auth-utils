@@ -13,7 +13,9 @@ import org.ldaptive.SearchResult;
 import org.ldaptive.cache.LRUCache;
 import org.ldaptive.pool.ConnectionPool;
 import org.ldaptive.pool.PooledConnectionFactory;
+import org.ldaptive.pool.SearchValidator;
 import org.ldaptive.pool.SoftLimitConnectionPool;
+import org.ldaptive.pool.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,8 @@ public class LdapRoleLookupService {
 
   private ConnectionPool connectionPool;
 
+  private ConnectionConfig connectionConfig;
+
   private String ldapURL;
 
   private String bindDN;
@@ -55,11 +59,6 @@ public class LdapRoleLookupService {
 
   @PostConstruct
   public void initialize() {
-    final ConnectionConfig connectionConfig = new ConnectionConfig(ldapURL);
-    connectionConfig.setUseStartTLS(true);
-    connectionConfig.setConnectionInitializer(new BindConnectionInitializer(bindDN, new Credential(bindPassword)));
-
-    connectionPool = new SoftLimitConnectionPool(new DefaultConnectionFactory(connectionConfig));
     connectionPool.initialize();
     connectionFactory = new PooledConnectionFactory(connectionPool);
 
@@ -199,5 +198,13 @@ public class LdapRoleLookupService {
 
   public void setConnectionPool(ConnectionPool connectionPool) {
     this.connectionPool = connectionPool;
+  }
+
+  public ConnectionConfig getConnectionConfig() {
+    return connectionConfig;
+  }
+
+  public void setConnectionConfig(ConnectionConfig connectionConfig) {
+    this.connectionConfig = connectionConfig;
   }
 }
